@@ -4,18 +4,18 @@ module.exports = {
   config: {
     name: "jan",
     version: "1.4.0",
-    author: "SiamTheFrog",
+    author: "Aminulsordar",
     countDown: 0,
     role: 0,
-    shortDescription: "Jan AI Chatbot",
-    longDescription: "Jan AI Bot that can be taught and answer questions.",
+    shortDescription: "Jan AI চ্যাটবট",
+    longDescription: "Jan AI বট যেটা শেখানো যেতে পারে এবং প্রশ্নের উত্তর দিতে পারে।",
     category: "jan",
     guide: "{pn} <message>\n{pn} teach <question> - <answer>\n{pn} count"
   },
 
   async fetchCount() {
     try {
-      const response = await axios.get(`https://jan-api-v2-siamthefrog-0ud6.onrender.com/count`);
+      const response = await axios.get(`https://jan-api-rrag.onrender.com/count`);
       return response.data;
     } catch (error) {
       return { questions: 0, answers: 0 };
@@ -24,19 +24,19 @@ module.exports = {
 
   async getAnswer(question) {
     try {
-      const response = await axios.get(`https://jan-api-v2-siamthefrog-0ud6.onrender.com/answer/${encodeURIComponent(question)}`);
-      return response.data.answer || "❌ I haven't learned this yet, please teach me! 👀";
+      const response = await axios.get(`https://jan-api-rrag.onrender.com/answer/${encodeURIComponent(question)}`);
+      return response.data.answer || "❌ আমি এখনো এটা শিখিনি, দয়া করে আমাকে শেখান! 👀";
     } catch (error) {
-      return "❌ Please teach me!";
+      return "❌ দয়া করে আমাকে শেখান!";
     }
   },
 
   async teachMultiple(qaText) {
     try {
-      const response = await axios.post(`https://jan-api-v2-siamthefrog-0ud6.onrender.com/teach`, { text: qaText });
+      const response = await axios.post(`https://jan-api-rrag.onrender.com/teach`, { text: qaText });
       return response.data.message;
     } catch (error) {
-      return "❌ Failed to teach!";
+      return "❌ শেখানো ব্যর্থ!";
     }
   },
 
@@ -58,7 +58,7 @@ module.exports = {
 
   onStart: async function ({ api, args, event }) {
     if (args.length < 1) {
-      return api.sendMessage("❌ Please ask a question!", event.threadID, event.messageID);
+      return api.sendMessage("❌ দয়া করে একটি প্রশ্ন করুন!", event.threadID, event.messageID);
     }
 
     const command = args[0].toLowerCase();
@@ -66,11 +66,11 @@ module.exports = {
     if (command === "count") {
       const countData = await this.fetchCount();
       return api.sendMessage(
-        `📊 Knowledge Base:\n\n` +
-        `📌 Total Questions: ${countData.questions}\n` +
-        `📌 Total Answers: ${countData.answers}\n\n` +
-        `💡 Keep teaching me to make me smarter!\n` +
-        `🔍 Ask me anything, and I'll try my best to answer!`,
+        `📊 জ্ঞানভাণ্ডার:\n\n` +
+        `📌 মোট প্রশ্ন: ${countData.questions}\n` +
+        `📌 মোট উত্তর: ${countData.answers}\n\n` +
+        `💡 আমাকে আরও শেখানোর মাধ্যমে আমাকে আরও স্মার্ট বানান!\n` +
+        `🔍 কিছু প্রশ্ন করুন, আমি চেষ্টা করব উত্তর দেওয়ার!`,
         event.threadID, event.messageID
       );
     }
@@ -78,7 +78,7 @@ module.exports = {
     if (command === "teach") {
       const input = args.slice(1).join(" ").trim();
       if (!input.includes(" - ")) {
-        return api.sendMessage("❌ Please use the correct format:\n/teach question - answer\nYou can add multiple questions using '|'", event.threadID, event.messageID);
+        return api.sendMessage("❌ সঠিক ফরম্যাট ব্যবহার করুন:\n/teach question - answer\nআপনি একাধিক প্রশ্ন একসাথে দিতে পারেন '|'-এর মাধ্যমে", event.threadID, event.messageID);
       }
 
       const responseMessage = await this.teachMultiple(input);
@@ -98,5 +98,44 @@ module.exports = {
         });
       }
     }, event.messageID);
+  },
+
+  onChat: async function ({ api, event }) {
+    try {
+      const body = event.body ? event.body.toLowerCase().trim() : "";
+
+      const prefixes = ["baby", "bby", "bot", "jan", "babu", "janu"];
+      const startsWithPrefix = prefixes.find(prefix => body.startsWith(prefix));
+
+      if (startsWithPrefix) {
+        const question = body.replace(/^\S+\s*/, "").trim();
+
+        if (question.length > 0) {
+          const responseMessage = await this.getAnswer(body);
+          return api.sendMessage(responseMessage, event.threadID, (error, info) => {
+            if (!error) {
+              global.GoatBot.onReply.set(info.messageID, {
+                commandName: this.config.name,
+                type: "reply",
+                messageID: info.messageID,
+                author: event.senderID
+              });
+            }
+          }, event.messageID);
+        }
+
+        const randomReplies = [
+          "😚",
+          "হ্যাঁ 😀, আমি এখানে আছি",
+          "কেমন আছো?",
+          "বলো জান কি করতে পারি তোমার জন্য",
+          `তুমি বলেছো: "${body}"? কিউট!`
+        ];
+        const randomReply = randomReplies[Math.floor(Math.random() * randomReplies.length)];
+        return api.sendMessage(randomReply, event.threadID, event.messageID);
+      }
+    } catch (err) {
+      console.error("onChat error:", err);
+    }
   }
 };
