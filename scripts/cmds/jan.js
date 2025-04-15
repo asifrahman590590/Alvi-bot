@@ -15,7 +15,7 @@ module.exports = {
 
   async fetchCount() {
     try {
-      const response = await axios.get(`https://jan-api-rrag.onrender.com/count`);
+      const response = await axios.get(`https://jan-api-by-aminul-sordar.vercel.app/count`);
       return response.data;
     } catch (error) {
       return { questions: 0, answers: 0 };
@@ -24,19 +24,19 @@ module.exports = {
 
   async getAnswer(question) {
     try {
-      const response = await axios.get(`https://jan-api-rrag.onrender.com/answer/${encodeURIComponent(question)}`);
+      const response = await axios.get(`https://jan-api-by-aminul-sordar.vercel.app/answer/${encodeURIComponent(question)}`);
       return response.data.answer || "❌ আমি এখনো এটা শিখিনি, দয়া করে আমাকে শেখান! 👀";
     } catch (error) {
-      return "❌ দয়া করে আমাকে শেখান!";
+      return "❌ সার্ভার থেকে উত্তর পাওয়া যায়নি, পরে আবার চেষ্টা করুন!";
     }
   },
 
   async teachMultiple(qaText) {
     try {
-      const response = await axios.post(`https://jan-api-rrag.onrender.com/teach`, { text: qaText });
+      const response = await axios.post(`https://jan-api-by-aminul-sordar.vercel.app/teach`, { text: qaText });
       return response.data.message;
     } catch (error) {
-      return "❌ শেখানো ব্যর্থ!";
+      return "❌ শেখানো ব্যর্থ হয়েছে! সার্ভার সমস্যা হতে পারে।";
     }
   },
 
