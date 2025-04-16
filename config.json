@@ -17,7 +17,7 @@
     "ignoreCommand": []
   },
   "adminBot": [
-    "100071880593545",
+    "100002191460189",
     ""
   ],
   "whiteListMode": {
@@ -28,9 +28,9 @@
   "OWNER": "AMINUL-SORDAR",
   "AGE": "18",
   "GENDER": "MALE",
-  "nickNameBot": "𝐀𝐌𝐈𝐍𝐔𝐋-𝐁𝐎𝐓",
+  "nickNameBot": "Alvi-bot",
   "FACEBOOK": "https://www.facebook.com/br4nd.abir.your.next.bf.jan",
-  "prefix": "#",
+  "prefix": "/",
   "database": {
     "type": "sqlite",
     "uriMongodb": "",
