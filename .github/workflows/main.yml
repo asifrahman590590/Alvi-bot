@@ -1,23 +1,21 @@
-name: Node.js CI (Combined)
+name: Node.js CI
 
 on:
-  # Original triggers for push and pull requests
   push:
     branches: [ main ]
   pull_request:
     branches: [ main ]
 
-  # Scheduled workflow for additional runs
-  schedule:
-    - cron: "0 */6 * * *"  # Runs every 6 hours (0 minute, every 6th hour, every day)
-
 jobs:
   build:
+
+
     runs-on: ubuntu-latest
 
     strategy:
       matrix:
-        node-version: [16.x]
+        node-version: [18.x]
+        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
     - uses: actions/checkout@v2
@@ -27,4 +25,4 @@ jobs:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
     - run: npm install
-    - run: npm start
+    - run: node index.js
